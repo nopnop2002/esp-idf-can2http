@@ -95,13 +95,13 @@ menu "Application Configuration"
 	menu "HTTP Server Setting"
 
 		config WEB_SERVER
-			string "HTTP Server"
+			string "HTTP Server IP or mDNS"
 			default "myhttpserver"
 			help
 				The host name or IP address of the HTTP server to use.
 
 		config WEB_PORT
-			int "HTTP Port"
+			int "HTTP Server Port"
 			default 8000
 			help
 				HTTP server port to use.
