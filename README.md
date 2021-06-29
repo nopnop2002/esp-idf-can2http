@@ -74,7 +74,7 @@ Check [here](http://www.ti.com/lit/an/slla337/slla337.pdf).
 # Installation for ESP32
 ```
 git clone https://github.com/nopnop2002/esp-idf-can2http
-cd esp-idf-can2htp
+cd esp-idf-can2http
 idf.py set-target esp32
 idf.py menuconfig
 idf.py flash
@@ -103,13 +103,13 @@ idf.py flash
 ![config-http](https://user-images.githubusercontent.com/6020549/123870716-b702aa80-d96d-11eb-8954-6ca365e78639.jpg)
 
 # Definition from CANbus to HTTP
-When CANbus data is received, it is sent by HTTP according to csv/can2http.csv.   
+When CANbus data is received, it is sent by HTTP POST according to csv/can2http.csv.   
 The file can2http.csv has three columns.   
 In the first column you need to specify the CAN Frame type.   
 The CAN frame type is either S(Standard frame) or E(Extended frame).   
 In the second column you have to specify the CAN-ID as a __hexdecimal number__.    
-In the last column you have to specify the HTTP-Path.   
-Each CAN-ID and each HTTP-Path is allowed to appear only once in the whole file.   
+In the last column you have to specify the HTTP-POST-Path.   
+Each CAN-ID and each HTTP-POST-Path is allowed to appear only once in the whole file.   
 
 ```
 S,101,/post
@@ -118,9 +118,8 @@ S,103,/post
 E,103,/post
 ```
 
-When a Standard CAN frame with ID 0x101 is received, it is POST by PATH of "/post".   
-When a Extended CAN frame with ID 0x101 is received, it is POST by PATH of "/post".   
-http://{HTTP-Server-IP}:{HTTP-Server-Port}/post/{CAN-Data}
+When a Standard CAN frame with ID 0x101 is received, POST with the "/post" PATH.   
+When a Extended CAN frame with ID 0x101 is received, POST with the "/post" PATH.   
 
 # HTTP Server Using Tornado
 ```
@@ -148,7 +147,7 @@ python can.py
 
 
 # List data Using Brouser
-Open your browser and put the IP address in the address bar.   
+Open your browser and put the URL in the address bar.   
 
 ![can2http-browser](https://user-images.githubusercontent.com/6020549/123872025-71df7800-d96f-11eb-8832-8d9e1169c993.jpg)
 
