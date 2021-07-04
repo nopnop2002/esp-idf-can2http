@@ -146,8 +146,8 @@ python can.py
 ![can2http-flask](https://user-images.githubusercontent.com/6020549/123871850-35ac1780-d96f-11eb-9d03-c1a0b547e9c8.jpg)
 
 
-# List data Using Brouser
-Open your browser and put the URL in the address bar.   
+# Brows data Using Tornado/Flask   
+Open your browser and put the Server's IP in the address bar.   
 
 ![can2http-browser](https://user-images.githubusercontent.com/6020549/123872025-71df7800-d96f-11eb-8832-8d9e1169c993.jpg)
 
