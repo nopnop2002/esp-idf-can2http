@@ -1,6 +1,7 @@
 # esp-idf-can2http
 CANbus to http bridge using esp32.   
 It's purpose is to be a bridge between a CAN-Bus and a HTTP-Server.    
+You can visualize CAN-Frame using a visualization library such as Matplotlib.   
 
 I inspired from [here](https://github.com/c3re/can2mqtt).
 
