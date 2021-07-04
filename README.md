@@ -123,7 +123,7 @@ When a Extended CAN frame with ID 0x101 is received, POST with the "/post" PATH.
 
 # HTTP Server Using Tornado
 ```
-sudo apt install python3-pip python3-setuptools python3-magic
+sudo apt install python3-pip python3-setuptools
 python -m pip install -U pip
 python -m pip install -U wheel
 python -m pip install tornado
@@ -134,7 +134,7 @@ python can.py
 
 # HTTP Server Using Flask
 ```
-sudo apt install python3-pip python3-setuptools python3-magic
+sudo apt install python3-pip python3-setuptools
 python -m pip install -U pip
 python -m pip install -U wheel
 python -m pip install -U Werkzeug
