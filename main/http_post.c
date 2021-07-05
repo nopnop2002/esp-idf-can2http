@@ -181,6 +181,7 @@ void http_client_task(void *pvParameters)
 		//char *post_data = "{\"canid\":257}";
 		//http_rest_with_url(frameBuf.topic, post_data);
 		http_rest_with_url(frameBuf.topic, json_string);
+		cJSON_free(json_string);
 	} // end while
 
 	// Never reach here
