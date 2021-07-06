@@ -124,6 +124,18 @@ E,103,/post
 When a Standard CAN frame with ID 0x101 is received, POST with the "/post" PATH.   
 When a Extended CAN frame with ID 0x101 is received, POST with the "/post" PATH.   
 
+# POST Parameter Example  
+```
+{'canid':257, 'frame': 'standard', 'data': [1,2,3,4,5,6,7,8]}
+{'canid':257, 'frame': 'extended', 'data': [1,2,3,4,5,6,7,8]}
+{'canid':259, 'frame': 'standard', 'data': [1,2,3,4,5,6,7,8]}
+{'canid':259, 'frame': 'extended', 'data': [1,2,3,4,5,6,7,8]}
+```
+
+When a CAN frame with ID 0x101 is received, POST with the 'canid':257.   
+When a CAN frame with ID 0x103 is received, POST with the 'canid':259.   
+
+
 # HTTP Server Using Tornado
 ```
 sudo apt install python3-pip python3-setuptools
