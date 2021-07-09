@@ -22,7 +22,7 @@
 
 static const char *TAG = "HTTP";
 
-extern QueueHandle_t xQueue_http;
+extern QueueHandle_t xQueue_http_client;
 
 esp_err_t _http_event_handler(esp_http_client_event_t *evt)
 {
@@ -151,7 +151,7 @@ void http_client_task(void *pvParameters)
 	ESP_LOGI(TAG, "Start HTTP Client: http://%s:%d", CONFIG_WEB_SERVER, CONFIG_WEB_PORT);
 	FRAME_t frameBuf;
 	while (1) {
-		xQueueReceive(xQueue_http, &frameBuf, portMAX_DELAY);
+		xQueueReceive(xQueue_http_client, &frameBuf, portMAX_DELAY);
 		ESP_LOGI(TAG, "canid=%x ext=%d topic=[%s]", frameBuf.canid, frameBuf.ext, frameBuf.topic);
 		for(int i=0;i<frameBuf.data_len;i++) {
 			ESP_LOGI(TAG, "DATA=%x", frameBuf.data[i]);

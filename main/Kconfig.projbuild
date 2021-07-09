@@ -90,6 +90,39 @@ menu "Application Configuration"
 			help
 				Set the Maximum retry to avoid station reconnecting to the AP unlimited when the AP is really inexistent.
 
+		config MDNS_HOSTNAME
+			string "mDNS Hostname"
+			default "esp32-server"
+			help
+				The mDNS host name used by the ESP32.
+
+		config STATIC_IP
+			bool "Enable Static IP Address"
+			default false
+			help
+				Enable Static IP Address.
+
+		config STATIC_IP_ADDRESS
+			depends on STATIC_IP
+			string "Static IP Address"
+			default "192.168.10.100"
+			help
+				Static IP Address for Station.
+
+		config STATIC_GW_ADDRESS
+			depends on STATIC_IP
+			string "Static GW Address"
+			default "192.168.10.1"
+			help
+				Static GW Address for Station.
+
+		config STATIC_NM_ADDRESS
+			depends on STATIC_IP
+			string "Static Netmask"
+			default "255.255.255.0"
+			help
+				Static Netmask for Station.
+
 	endmenu
 
 	menu "HTTP Server Setting"

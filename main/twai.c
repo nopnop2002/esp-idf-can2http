@@ -22,8 +22,8 @@
 
 static const char *TAG = "TWAI";
 
-extern QueueHandle_t xQueue_http;
-//extern QueueHandle_t xQueue_twai_tx;
+extern QueueHandle_t xQueue_http_client;
+extern QueueHandle_t xQueue_twai_tx;
 
 extern TOPIC_t *publish;
 extern int16_t npublish;
@@ -36,9 +36,9 @@ void twai_task(void *pvParameters)
 	dump_table(publish, npublish);
 
 	twai_message_t rx_msg;
+	twai_message_t tx_msg;
 	FRAME_t frameBuf;
 	while (1) {
-		//esp_err_t ret = twai_receive(&rx_msg, pdMS_TO_TICKS(1));
 		esp_err_t ret = twai_receive(&rx_msg, pdMS_TO_TICKS(10));
 		if (ret == ESP_OK) {
 			ESP_LOGD(TAG,"twai_receive identifier=0x%x flags=0x%x data_length_code=%d",
@@ -49,8 +49,8 @@ void twai_task(void *pvParameters)
 			ESP_LOGD(TAG, "ext=%x rtr=%x", ext, rtr);
 
 #if CONFIG_ENABLE_PRINT
-			if (ext == 0) {
-				printf("Standard ID: 0x%03x     ", rx_msg.identifier);
+			if (ext == STANDARD_FRAME) {
+				printf("Standard ID: 0x%03x		", rx_msg.identifier);
 			} else {
 				printf("Extended ID: 0x%08x", rx_msg.identifier);
 			}
@@ -73,6 +73,7 @@ void twai_task(void *pvParameters)
 					ESP_LOGI(TAG, "publish[%d] frame=%d canid=0x%x topic=[%s] topic_len=%d",
 					index, publish[index].frame, publish[index].canid, publish[index].topic, publish[index].topic_len);
 					strcpy(frameBuf.topic, publish[index].topic);
+					frameBuf.command = CMD_RECEIVE;
 					frameBuf.topic_len = publish[index].topic_len;
 					frameBuf.canid = rx_msg.identifier;
 					frameBuf.ext = ext;
@@ -85,20 +86,39 @@ void twai_task(void *pvParameters)
 					for(int i=0;i<frameBuf.data_len;i++) {
 						frameBuf.data[i] = rx_msg.data[i];
 					}
-					if (xQueueSend(xQueue_http, &frameBuf, portMAX_DELAY) != pdPASS) {
+					if (xQueueSend(xQueue_http_client, &frameBuf, portMAX_DELAY) != pdPASS) {
 						ESP_LOGE(TAG, "xQueueSend Fail");
 					}
 				}
 			}
 
 		} else if (ret == ESP_ERR_TIMEOUT) {
+			if (xQueueReceive(xQueue_twai_tx, &tx_msg, 0) == pdTRUE) {
+				ESP_LOGI(TAG, "tx_msg.identifier=[0x%x] tx_msg.extd=%d", tx_msg.identifier, tx_msg.extd);
+				twai_status_info_t status_info;
+				twai_get_status_info(&status_info);
+				ESP_LOGD(TAG, "status_info.state=%d",status_info.state);
+				if (status_info.state != TWAI_STATE_RUNNING) {
+					ESP_LOGE(TAG, "TWAI driver not running %d", status_info.state);
+					continue;
+				}
+				ESP_LOGD(TAG, "status_info.msgs_to_tx=%d",status_info.msgs_to_tx);
+				ESP_LOGD(TAG, "status_info.msgs_to_rx=%d",status_info.msgs_to_rx);
+				//esp_err_t ret = twai_transmit(&tx_msg, pdMS_TO_TICKS(10));
+				esp_err_t ret = twai_transmit(&tx_msg, 0);
+				if (ret == ESP_OK) {
+					ESP_LOGI(TAG, "twai_transmit success");
+				} else {
+					ESP_LOGE(TAG, "twai_transmit Fail %s", esp_err_to_name(ret));
+				}
+			}
 
 		} else {
 			ESP_LOGE(TAG, "twai_receive Fail %s", esp_err_to_name(ret));
 		}
 	}
 
-	// never reach
+	// Never reach here
 	vTaskDelete(NULL);
 }
 

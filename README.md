@@ -2,13 +2,11 @@
 CANbus to http bridge using esp32.   
 It's purpose is to be a bridge between a CAN-Bus and a HTTP-Server.    
 
-![slide0001](https://user-images.githubusercontent.com/6020549/124377885-62528d00-dce9-11eb-8995-265a249d968d.jpg)
+![slide0001](https://user-images.githubusercontent.com/6020549/125028569-3ce7c980-e0c3-11eb-8450-6aabb9a564d6.jpg)
+![slide0002](https://user-images.githubusercontent.com/6020549/125028561-3b1e0600-e0c3-11eb-81bc-670b8b510847.jpg)
 
 You can visualize CAN-Frame using a visualization library such as Matplotlib.   
-
-![slide0002](https://user-images.githubusercontent.com/6020549/124377889-65e61400-dce9-11eb-8ff0-4aad3f55eefc.jpg)
-
-I inspired from [here](https://github.com/c3re/can2mqtt).
+![slide0003](https://user-images.githubusercontent.com/6020549/125028566-3c4f3300-e0c3-11eb-8f16-bf86126a75c2.jpg)
 
 # Software requirement
 esp-idf v4.2-dev-2243 or later.   
@@ -100,7 +98,13 @@ idf.py flash
 ![config-can](https://user-images.githubusercontent.com/6020549/123870665-a05c5380-d96d-11eb-89b1-78a274bfd957.jpg)
 
 ## WiFi Setting
-![config-wifi](https://user-images.githubusercontent.com/6020549/123870681-a81bf800-d96d-11eb-8637-66295408b055.jpg)
+![config-wifi-1](https://user-images.githubusercontent.com/6020549/125028704-73254900-e0c3-11eb-9a44-25482d7a08be.jpg)
+
+You can use static IP.
+![config-wifi-2](https://user-images.githubusercontent.com/6020549/125028738-80423800-e0c3-11eb-984f-9dc4f892bdb6.jpg)
+
+Connect using mDNS.
+![config-wifi-3](https://user-images.githubusercontent.com/6020549/125028763-89cba000-e0c3-11eb-921d-9baca5ec58d4.jpg)
 
 ## HTTP Server Setting
 ![config-http](https://user-images.githubusercontent.com/6020549/123873614-b5d37c80-d971-11eb-8ead-827f52aed982.jpg)
@@ -111,8 +115,8 @@ The file can2http.csv has three columns.
 In the first column you need to specify the CAN Frame type.   
 The CAN frame type is either S(Standard frame) or E(Extended frame).   
 In the second column you have to specify the CAN-ID as a __hexdecimal number__.    
-In the last column you have to specify the HTTP-POST-Path.   
-Each CAN-ID and each HTTP-POST-Path is allowed to appear only once in the whole file.   
+In the last column you have to specify the HTTP-POST-Path of external HTTP server.   
+Each CAN-ID is allowed to appear only once in the whole file.   
 
 ```
 S,101,/post
@@ -121,20 +125,39 @@ S,103,/post
 E,103,/post
 ```
 
-When a Standard CAN frame with ID 0x101 is received, POST with the "/post" PATH.   
-When a Extended CAN frame with ID 0x101 is received, POST with the "/post" PATH.   
-
-# POST Parameter Example  
-```
-{'canid':257, 'frame': 'standard', 'data': [1,2,3,4,5,6,7,8]}
-{'canid':257, 'frame': 'extended', 'data': [1,2,3,4,5,6,7,8]}
-{'canid':259, 'frame': 'standard', 'data': [1,2,3,4,5,6,7,8]}
-{'canid':259, 'frame': 'extended', 'data': [1,2,3,4,5,6,7,8]}
-```
-
 When a CAN frame with ID 0x101 is received, POST with the 'canid':257.   
 When a CAN frame with ID 0x103 is received, POST with the 'canid':259.   
 
+POST Parameter Example:  
+```
+{"canid":257, "frame": "standard", "data": [16, 17, 18]}
+{"canid":257, "frame": "extended", "data": [16, 17, 18]}
+{"canid":259, "frame": "standard", "data": [16, 17, 18]}
+{"canid":259, "frame": "extended", "data": [16, 17, 18]}
+```
+
+# Definition from HTTP to CANbus
+When HTTP POST is received, it is sent by CANBus according to csv/http2can.csv.   
+Other than this, it is the same as csv/can2http.csv.
+In the last column you have to specify the HTTP-POST-Path of built-in HTTP server.   
+
+```
+S,201,/receive
+E,201,/receive
+S,203,/receive
+E,203,/receive
+```
+
+When receiving the {"canid": 513, "frame": "standard", "data": [16, 17, 18]}, send the Standard CAN frame with ID 0x201.   
+When receiving the {"canid": 515, "frame": "extended", "data": [16, 17, 18]}, send the Extended CAN frame with ID 0x201.   
+
+
+# Send message using curl   
+```
+$ curl -X POST -H "Content-Type: application/json" -d '{"canid": 513, "frame": "standard", "data": [16, 17, 18]}' http://esp32-server.local:8000/api/twai/send
+
+$ curl -X POST -H "Content-Type: application/json" -d '{"canid": 513, "frame": "extended", "data": [16, 17, 18]}' http://esp32-server.local:8000/api/twai/send
+```
 
 # HTTP Server Using Tornado
 ```

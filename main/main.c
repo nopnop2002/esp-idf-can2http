@@ -22,6 +22,8 @@
 #include "esp_err.h"
 #include "esp_log.h"
 #include "esp_spiffs.h" 
+#include "mdns.h"
+#include "lwip/dns.h"
 #include "driver/twai.h" // Update from V4.2
 
 #include "twai.h"
@@ -67,10 +69,13 @@ static EventGroupHandle_t s_wifi_event_group;
 
 static int s_retry_num = 0;
 
-QueueHandle_t xQueue_http;
+QueueHandle_t xQueue_http_client;
+QueueHandle_t xQueue_twai_tx;
 
 TOPIC_t *publish;
 int16_t	npublish;
+TOPIC_t *subscribe;
+int16_t	nsubscribe;
 
 static void event_handler(void* arg, esp_event_base_t event_base,
 								int32_t event_id, void* event_data)
@@ -94,45 +99,83 @@ static void event_handler(void* arg, esp_event_base_t event_base,
 	}
 }
 
-bool wifi_init_sta(void)
+void wifi_init_sta()
 {
-	bool ret = false;
 	s_wifi_event_group = xEventGroupCreate();
 
-	ESP_ERROR_CHECK(esp_netif_init());
+	ESP_LOGI(TAG,"ESP-IDF Ver%d.%d", ESP_IDF_VERSION_MAJOR, ESP_IDF_VERSION_MINOR);
 
+#if ESP_IDF_VERSION_MAJOR >= 4 && ESP_IDF_VERSION_MINOR >= 1
+	ESP_LOGI(TAG,"ESP-IDF esp_netif");
+	ESP_ERROR_CHECK(esp_netif_init());
 	ESP_ERROR_CHECK(esp_event_loop_create_default());
-	esp_netif_create_default_wifi_sta();
+	esp_netif_t *netif = esp_netif_create_default_wifi_sta();
+#else
+	ESP_LOGI(TAG,"ESP-IDF tcpip_adapter");
+	tcpip_adapter_init();
+	ESP_ERROR_CHECK(esp_event_loop_create_default());
+#endif
+
+#if CONFIG_STATIC_IP
+
+	ESP_LOGI(TAG, "CONFIG_STATIC_IP_ADDRESS=[%s]",CONFIG_STATIC_IP_ADDRESS);
+	ESP_LOGI(TAG, "CONFIG_STATIC_GW_ADDRESS=[%s]",CONFIG_STATIC_GW_ADDRESS);
+	ESP_LOGI(TAG, "CONFIG_STATIC_NM_ADDRESS=[%s]",CONFIG_STATIC_NM_ADDRESS);
+
+#if ESP_IDF_VERSION_MAJOR >= 4 && ESP_IDF_VERSION_MINOR >= 1
+	/* Stop DHCP client */
+	ESP_ERROR_CHECK(esp_netif_dhcpc_stop(netif));
+	ESP_LOGI(TAG, "Stop DHCP Services");
+
+	/* Set STATIC IP Address */
+	esp_netif_ip_info_t ip_info;
+	memset(&ip_info, 0 , sizeof(esp_netif_ip_info_t));
+	ip_info.ip.addr = ipaddr_addr(CONFIG_STATIC_IP_ADDRESS);
+	ip_info.netmask.addr = ipaddr_addr(CONFIG_STATIC_NM_ADDRESS);
+	ip_info.gw.addr = ipaddr_addr(CONFIG_STATIC_GW_ADDRESS);;
+	esp_netif_set_ip_info(netif, &ip_info);
+
+#else
+	/* Stop DHCP client */
+	tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_STA);
+	ESP_LOGI(TAG, "Stop DHCP Services");
+
+	/* Set STATIC IP Address */
+	tcpip_adapter_ip_info_t ip_info;
+	memset(&ip_info, 0 , sizeof(tcpip_adapter_ip_info_t));
+	ip_info.ip.addr = ipaddr_addr(CONFIG_STATIC_IP_ADDRESS);
+	ip_info.netmask.addr = ipaddr_addr(CONFIG_STATIC_NM_ADDRESS);
+	ip_info.gw.addr = ipaddr_addr(CONFIG_STATIC_GW_ADDRESS);;
+	tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_STA, &ip_info);
+#endif
+
+	/*
+	I referred from here.
+	https://www.esp32.com/viewtopic.php?t=5380
+	if we should not be using DHCP (for example we are using static IP addresses),
+	then we need to instruct the ESP32 of the locations of the DNS servers manually.
+	Google publicly makes available two name servers with the addresses of 8.8.8.8 and 8.8.4.4.
+	*/
+
+	ip_addr_t d;
+	d.type = IPADDR_TYPE_V4;
+	d.u_addr.ip4.addr = 0x08080808; //8.8.8.8 dns
+	dns_setserver(0, &d);
+	d.u_addr.ip4.addr = 0x08080404; //8.8.4.4 dns
+	dns_setserver(1, &d);
+
+#endif
 
 	wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
 	ESP_ERROR_CHECK(esp_wifi_init(&cfg));
 
-	esp_event_handler_instance_t instance_any_id;
-	esp_event_handler_instance_t instance_got_ip;
-	ESP_ERROR_CHECK(esp_event_handler_instance_register(WIFI_EVENT,
-														ESP_EVENT_ANY_ID,
-														&event_handler,
-														NULL,
-														&instance_any_id));
-	ESP_ERROR_CHECK(esp_event_handler_instance_register(IP_EVENT,
-														IP_EVENT_STA_GOT_IP,
-														&event_handler,
-														NULL,
-														&instance_got_ip));
+	ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &event_handler, NULL));
+	ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &event_handler, NULL));
 
 	wifi_config_t wifi_config = {
 		.sta = {
 			.ssid = CONFIG_ESP_WIFI_SSID,
-			.password = CONFIG_ESP_WIFI_PASSWORD,
-			/* Setting a password implies station will connect to all security modes including WEP/WPA.
-			 * However these modes are deprecated and not advisable to be used. Incase your Access point
-			 * doesn't support WPA2, these mode can be enabled by commenting below line */
-		 .threshold.authmode = WIFI_AUTH_WPA2_PSK,
-
-			.pmf_cfg = {
-				.capable = true,
-				.required = false
-			},
+			.password = CONFIG_ESP_WIFI_PASSWORD
 		},
 	};
 	ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA) );
@@ -154,19 +197,27 @@ bool wifi_init_sta(void)
 	if (bits & WIFI_CONNECTED_BIT) {
 		ESP_LOGI(TAG, "connected to ap SSID:%s password:%s",
 				 CONFIG_ESP_WIFI_SSID, CONFIG_ESP_WIFI_PASSWORD);
-		ret = true;
 	} else if (bits & WIFI_FAIL_BIT) {
 		ESP_LOGI(TAG, "Failed to connect to SSID:%s, password:%s",
 				 CONFIG_ESP_WIFI_SSID, CONFIG_ESP_WIFI_PASSWORD);
 	} else {
 		ESP_LOGE(TAG, "UNEXPECTED EVENT");
 	}
-
-	/* The event will not be processed after unregister */
-	ESP_ERROR_CHECK(esp_event_handler_instance_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, instance_got_ip));
-	ESP_ERROR_CHECK(esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, instance_any_id));
 	vEventGroupDelete(s_wifi_event_group);
-	return ret;
+}
+
+void initialise_mdns(void)
+{
+	//initialize mDNS
+	ESP_ERROR_CHECK( mdns_init() );
+	//set mDNS hostname (required if you want to advertise services)
+	ESP_ERROR_CHECK( mdns_hostname_set(CONFIG_MDNS_HOSTNAME) );
+	ESP_LOGI(TAG, "mdns hostname set to: [%s]", CONFIG_MDNS_HOSTNAME);
+
+#if 0
+	//set default mDNS instance name
+	ESP_ERROR_CHECK( mdns_instance_name_set("ESP32 with mDNS") );
+#endif
 }
 
 esp_err_t mountSPIFFS(char * partition_label, char * base_path) {
@@ -326,6 +377,7 @@ void dump_table(TOPIC_t *topics, int16_t ntopic)
 }
 
 void http_client_task(void *pvParameters);
+void http_server_task(void *pvParameters);
 void twai_task(void *pvParameters);
 
 void app_main()
@@ -338,10 +390,9 @@ void app_main()
 	}
 	ESP_ERROR_CHECK(ret);
 
-	// WiFi initialize
-	if (wifi_init_sta() == false) {
-		while(1) vTaskDelay(10);
-	}
+	ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
+	wifi_init_sta();
+	initialise_mdns();
 
 	// Install and start TWAI driver
 	ESP_LOGI(TAG, "%s",BITRATE);
@@ -364,8 +415,10 @@ void app_main()
 	}
 
 	// Create Queue
-	xQueue_http = xQueueCreate( 10, sizeof(FRAME_t) );
-	configASSERT( xQueue_http );
+	xQueue_http_client = xQueueCreate( 10, sizeof(FRAME_t) );
+	configASSERT( xQueue_http_client );
+	xQueue_twai_tx = xQueueCreate( 10, sizeof(twai_message_t) );
+	configASSERT( xQueue_twai_tx );
 
 	// build publish table
 	ret = build_table(&publish, "/spiffs/can2http.csv", &npublish);
@@ -375,6 +428,22 @@ void app_main()
 	}
 	dump_table(publish, npublish);
 
-	xTaskCreate(http_client_task, "http", 1024*6, NULL, 2, NULL);
+	// build subscribe table
+	ret = build_table(&subscribe, "/spiffs/http2can.csv", &nsubscribe);
+	if (ret != ESP_OK) {
+		ESP_LOGE(TAG, "build subscribe table fail");
+		while(1) { vTaskDelay(1); }
+	}
+	dump_table(subscribe, nsubscribe);
+
+	/* Get the local IP address */
+	tcpip_adapter_ip_info_t ip_info;
+	ESP_ERROR_CHECK(tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip_info));
+
+	char cparam0[64];
+	sprintf(cparam0, "%s", ip4addr_ntoa(&ip_info.ip));
+	xTaskCreate(http_server_task, "server", 1024*6, (void *)cparam0, 2, NULL);
+
+	xTaskCreate(http_client_task, "client", 1024*6, NULL, 2, NULL);
 	xTaskCreate(twai_task, "twai_rx", 1024*6, NULL, 2, NULL);
 }

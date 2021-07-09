@@ -1,11 +1,11 @@
-#The file can2http.csv has three columns. 
+#The file mqtt2can.csv has three columns. 
 #In the first column you need to specify the CAN Frame type.
 #The CAN frame type is either S(Standard frame) or E(Extended frame).
 #In the second column you have to specify the CAN-ID as a __hexdecimal number__. 
-#In the last column you have to specify the PATH of external web server.
+#In the last column you have to specify the PATH of built-in web server.
 #Each CAN-ID is allowed to appear only once in the whole file.
 
-S,101,/post
-E,101,/post
-S,103,/post
-E,103,/post
+S,201,/receive
+E,201,/receive
+S,203,/receive
+E,203,/receive
