@@ -100,14 +100,18 @@ idf.py flash
 ## WiFi Setting
 ![config-wifi-1](https://user-images.githubusercontent.com/6020549/125028704-73254900-e0c3-11eb-9a44-25482d7a08be.jpg)
 
-You can use static IP.
+You can use static IP.   
 ![config-wifi-2](https://user-images.githubusercontent.com/6020549/125028738-80423800-e0c3-11eb-984f-9dc4f892bdb6.jpg)
 
-Connect using mDNS.
+You can connect using mDNS.   
 ![config-wifi-3](https://user-images.githubusercontent.com/6020549/125028763-89cba000-e0c3-11eb-921d-9baca5ec58d4.jpg)
 
-## HTTP Server Setting
+## External HTTP Server Setting   
+The External HTTP Server receives CAN Bus received data.   
 ![config-http](https://user-images.githubusercontent.com/6020549/123873614-b5d37c80-d971-11eb-8ead-827f52aed982.jpg)
+
+__Note__   
+The Built-in HTTP Server receives CAN Bus transmittion data.   
 
 # Definition from CANbus to HTTP
 When CANbus data is received, it is sent by HTTP POST according to csv/can2http.csv.   
