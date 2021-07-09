@@ -132,6 +132,8 @@ When a CAN frame with ID 0x101 is received, POST with the 'canid':257.
 When a CAN frame with ID 0x103 is received, POST with the 'canid':259.   
 
 POST Parameter Example:  
+CAN-ID is a decimal number, not a hexadecimal number.   
+
 ```
 {"canid":257, "frame": "standard", "data": [16, 17, 18]}
 {"canid":257, "frame": "extended", "data": [16, 17, 18]}
