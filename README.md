@@ -150,8 +150,10 @@ You can send any CAN-ID.
 CAN-ID is specified in __decimal number__.   
 ```
 $ curl -X POST -H "Content-Type: application/json" -d '{"canid": 513, "frame": "standard", "data": [16, 17, 18]}' http://esp32-server.local:8000/api/twai/send
+twai send successfully
 
 $ curl -X POST -H "Content-Type: application/json" -d '{"canid": 513, "frame": "extended", "data": [16, 17, 18]}' http://esp32-server.local:8000/api/twai/send
+twai send successfully
 ```
 
 CANBus reception using UNO.
