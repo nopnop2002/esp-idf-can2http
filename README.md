@@ -142,7 +142,7 @@ POST Parameter Example:
 
 # Definition from HTTP to CANbus
 When the Built-in HTTP server receives an HTTP POST, it is sent by CANBus according to csv/http2can.csv.   
-Other than this, it is the same as csv/can2http.csv.
+Other than this, it is the same as csv/can2http.csv.   
 In the last column you have to specify the HTTP-POST-Path of built-in HTTP server.   
 
 ```
