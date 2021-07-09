@@ -156,7 +156,7 @@ When receiving the {"canid": 513, "frame": "standard", "data": [16, 17, 18]}, se
 When receiving the {"canid": 515, "frame": "extended", "data": [16, 17, 18]}, send the Extended CAN frame with ID 0x201.   
 
 
-# Send message using curl   
+# Send CANBus frame using curl   
 ```
 $ curl -X POST -H "Content-Type: application/json" -d '{"canid": 513, "frame": "standard", "data": [16, 17, 18]}' http://esp32-server.local:8000/api/twai/send
 
