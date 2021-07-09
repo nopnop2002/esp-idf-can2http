@@ -153,9 +153,8 @@ S,203,/receive
 E,203,/receive
 ```
 
-When receiving the {"canid": 513, "frame": "standard", "data": [16, 17, 18]}, send the Standard CAN frame with ID 0x201.   
-When receiving the {"canid": 515, "frame": "extended", "data": [16, 17, 18]}, send the Extended CAN frame with ID 0x201.   
-
+If you POST {"canid": 513, "frame": "standard", "data": [16, 17, 18]}, send a standard CAN frame with ID 0x201.   
+If you POST {"canid": 513, "frame": "extended", "data": [16, 17, 18]}, send a extended CAN frame with ID 0x201.   
 
 # Send CANBus frame using curl   
 ```
