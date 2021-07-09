@@ -147,6 +147,7 @@ You can send any CAN-ID.
 
 
 # Send CANBus frame using curl   
+CAN-ID is specified in __decimal number__.   
 ```
 $ curl -X POST -H "Content-Type: application/json" -d '{"canid": 513, "frame": "standard", "data": [16, 17, 18]}' http://esp32-server.local:8000/api/twai/send
 
