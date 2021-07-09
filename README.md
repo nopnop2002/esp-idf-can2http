@@ -142,19 +142,9 @@ CAN-ID is a decimal number, not a hexadecimal number.
 ```
 
 # Definition from HTTP to CANbus
-When the Built-in HTTP server receives an HTTP POST, it is sent by CANBus according to csv/http2can.csv.   
-Other than this, it is the same as csv/can2http.csv.   
-In the last column you have to specify the HTTP-POST-Path of built-in HTTP server.   
+Not exist.   
+You can send any CAN-ID.   
 
-```
-S,201,/receive
-E,201,/receive
-S,203,/receive
-E,203,/receive
-```
-
-If you POST {"canid": 513, "frame": "standard", "data": [16, 17, 18]}, send a standard CAN frame with ID 0x201.   
-If you POST {"canid": 513, "frame": "extended", "data": [16, 17, 18]}, send a extended CAN frame with ID 0x201.   
 
 # Send CANBus frame using curl   
 ```

@@ -28,8 +28,6 @@ static const char *TAG = "SERVER";
 //static SemaphoreHandle_t ctrl_task_sem;
 
 extern QueueHandle_t xQueue_twai_tx;
-extern TOPIC_t *subscribe;
-extern int16_t nsubscribe;
 
 #define SCRATCH_BUFSIZE (1024)
 
@@ -43,40 +41,10 @@ typedef struct rest_server_context {
 static esp_err_t root_get_handler(httpd_req_t *req)
 {
 	ESP_LOGI(TAG, "root_get_handler req->uri=[%s]", req->uri);
-	for(int index=0;index<nsubscribe;index++) {
-		ESP_LOGI(TAG, "subscribe[%d] frame=%d canid=0x%x topic=[%s] topic_len=%d",
-		index, subscribe[index].frame, subscribe[index].canid, subscribe[index].topic, subscribe[index].topic_len);
-	}
-
-	/* Send HTML header */
-	httpd_resp_sendstr_chunk(req, "<!DOCTYPE html><html><body>");
-
-	httpd_resp_sendstr_chunk(req, "<table border=\"1\">");
-	httpd_resp_sendstr_chunk(req, "<thead><tr><th>Frame Type</th><th>Frame ID</th><th>HTTP Path</th></tr></thead>");
-
-	char chunk[64];
-	for(int index=0;index<nsubscribe;index++) {
-		char frameType[16];
-		strcpy(frameType, "Standard");
-		if (subscribe[index].frame == 1) strcpy(frameType, "Entended");
-		httpd_resp_sendstr_chunk(req, "<tr>");
-		sprintf(chunk, "<td align=\"center\">%16s</td>", frameType);
-		httpd_resp_sendstr_chunk(req, chunk);
-		sprintf(chunk, "<td align=\"center\">%x</td>", subscribe[index].canid);
-		httpd_resp_sendstr_chunk(req, chunk);
-		sprintf(chunk, "<td align=\"center\">%s</td>", subscribe[index].topic);
-		httpd_resp_sendstr_chunk(req, chunk);
-		httpd_resp_sendstr_chunk(req, "</tr>");
-	}
-
-	/* Finish the table */
-	httpd_resp_sendstr_chunk(req, "</tbody></table>");
-
-	/* Send remaining chunk of HTML file to complete it */
-	httpd_resp_sendstr_chunk(req, "</body></html>");
 
 	/* Send empty chunk to signal HTTP response completion */
 	httpd_resp_sendstr_chunk(req, NULL);
+
 
 	return ESP_OK;
 }
@@ -238,34 +206,20 @@ static esp_err_t twai_send_handler(httpd_req_t *req)
 	if (parse) {
 		ESP_LOGI(TAG, "twai_send_handler frame=%d canid=%x data_len=%d", frame, canid, data_len);
 		ESP_LOG_BUFFER_HEX(TAG, data_value, data_len);
-		bool isMatch = false;
-		for(int index=0;index<nsubscribe;index++) {
-			ESP_LOGI(TAG, "subscribe[%d] frame=%d canid=%x topic=[%s] topic_len=%d",
-			index, subscribe[index].frame, subscribe[index].canid, subscribe[index].topic, subscribe[index].topic_len);
-			if (subscribe[index].frame == frame && subscribe[index].canid == canid) {
-				isMatch = true;
-				twai_message_t tx_msg;
-				tx_msg.extd = frame;
-				tx_msg.ss = 1;
-				tx_msg.self = 0;
-				tx_msg.dlc_non_comp = 0;
-				tx_msg.identifier = canid;
-				tx_msg.data_length_code = data_len;
-				for (int i=0;i<data_len;i++) {
-					tx_msg.data[i] = data_value[i];
-				}
-				if (xQueueSend(xQueue_twai_tx, &tx_msg, portMAX_DELAY) != pdPASS) {
-					ESP_LOGE(TAG, "xQueueSend Fail");
-				}
-				httpd_resp_sendstr(req, "twai send successfully");
-				break;
-			} // end if
-		} // end for
-		if (isMatch == false) {
-			ESP_LOGE(TAG, "Not found canid in csv");
-			httpd_resp_sendstr(req, "Not found canid in csv");
+		twai_message_t tx_msg;
+		tx_msg.extd = frame;
+		tx_msg.ss = 1;
+		tx_msg.self = 0;
+		tx_msg.dlc_non_comp = 0;
+		tx_msg.identifier = canid;
+		tx_msg.data_length_code = data_len;
+		for (int i=0;i<data_len;i++) {
+			tx_msg.data[i] = data_value[i];
 		}
-		
+		if (xQueueSend(xQueue_twai_tx, &tx_msg, portMAX_DELAY) != pdPASS) {
+			ESP_LOGE(TAG, "xQueueSend Fail");
+		}
+		httpd_resp_sendstr(req, "twai send successfully");
 	} else {
 		ESP_LOGE(TAG, "Request parameter not correct");
 		httpd_resp_sendstr(req, "Request parameter not correct");

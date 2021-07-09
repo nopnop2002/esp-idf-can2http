@@ -74,8 +74,6 @@ QueueHandle_t xQueue_twai_tx;
 
 TOPIC_t *publish;
 int16_t	npublish;
-TOPIC_t *subscribe;
-int16_t	nsubscribe;
 
 static void event_handler(void* arg, esp_event_base_t event_base,
 								int32_t event_id, void* event_data)
@@ -427,14 +425,6 @@ void app_main()
 		while(1) { vTaskDelay(1); }
 	}
 	dump_table(publish, npublish);
-
-	// build subscribe table
-	ret = build_table(&subscribe, "/spiffs/http2can.csv", &nsubscribe);
-	if (ret != ESP_OK) {
-		ESP_LOGE(TAG, "build subscribe table fail");
-		while(1) { vTaskDelay(1); }
-	}
-	dump_table(subscribe, nsubscribe);
 
 	/* Get the local IP address */
 	tcpip_adapter_ip_info_t ip_info;
