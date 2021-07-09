@@ -174,7 +174,11 @@ static esp_err_t twai_send_handler(httpd_req_t *req)
 			ESP_LOGI(TAG, "data_array_size=%d", data_array_size);
 			bool data_valid = true;
 			data_len = data_array_size;
-			for (int i=0;i<data_array_size;i++) {
+			if (data_array_size > 8) {
+				ESP_LOGW(TAG, "Too many data arrays : %d", data_array_size);
+				data_len = 8;
+			} 
+			for (int i=0;i<data_len;i++) {
 				cJSON *array = cJSON_GetArrayItem(data_array,i);
 				//ESP_LOGI(TAG, "array->type=%s", JSON_Types(array->type));
 				uint16_t data_int = array->valueint;
@@ -182,7 +186,7 @@ static esp_err_t twai_send_handler(httpd_req_t *req)
 				if (data_int <= 0xff) {
 					data_value[i] = data_int;
 				} else {
-					ESP_LOGE(TAG, "data too large");
+					ESP_LOGE(TAG, "Too large data value : %x", data_int);
 					data_valid = false;
 				}
 			} // end for
