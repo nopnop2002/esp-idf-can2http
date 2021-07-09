@@ -141,7 +141,7 @@ POST Parameter Example:
 ```
 
 # Definition from HTTP to CANbus
-When HTTP POST is received, it is sent by CANBus according to csv/http2can.csv.   
+When the Built-in HTTP server receives an HTTP POST, it is sent by CANBus according to csv/http2can.csv.   
 Other than this, it is the same as csv/can2http.csv.
 In the last column you have to specify the HTTP-POST-Path of built-in HTTP server.   
 
@@ -163,7 +163,7 @@ $ curl -X POST -H "Content-Type: application/json" -d '{"canid": 513, "frame": "
 $ curl -X POST -H "Content-Type: application/json" -d '{"canid": 513, "frame": "extended", "data": [16, 17, 18]}' http://esp32-server.local:8000/api/twai/send
 ```
 
-CAN reception using UNO.
+CANBus reception using UNO.
 
 ![send_standard](https://user-images.githubusercontent.com/6020549/125029834-2c385300-e0c5-11eb-8f25-f3af82e90038.jpg)
 
