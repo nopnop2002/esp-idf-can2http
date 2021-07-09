@@ -2,11 +2,10 @@
 CANbus to http bridge using esp32.   
 It's purpose is to be a bridge between a CAN-Bus and a HTTP-Server.    
 
-![slide0001](https://user-images.githubusercontent.com/6020549/125028569-3ce7c980-e0c3-11eb-8450-6aabb9a564d6.jpg)
-![slide0002](https://user-images.githubusercontent.com/6020549/125028561-3b1e0600-e0c3-11eb-81bc-670b8b510847.jpg)
+![slide0001](https://user-images.githubusercontent.com/6020549/125031346-7ae6ec80-e0c7-11eb-8d8a-f419154d277c.jpg)
+![slide0002](https://user-images.githubusercontent.com/6020549/125031353-7d494680-e0c7-11eb-8382-df74fab44737.jpg)
+![slide0003](https://user-images.githubusercontent.com/6020549/125031358-7e7a7380-e0c7-11eb-9880-07c42a1a7d64.jpg)
 
-You can visualize CAN-Frame using a visualization library such as Matplotlib.   
-![slide0003](https://user-images.githubusercontent.com/6020549/125028566-3c4f3300-e0c3-11eb-8f16-bf86126a75c2.jpg)
 
 # Software requirement
 esp-idf v4.2-dev-2243 or later.   
