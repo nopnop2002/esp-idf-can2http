@@ -211,7 +211,6 @@ Open your browser and put the Server's IP in the address bar.
 There is a lot of information on the internet about the Python + visualization library.   
 - [matplotlib](https://matplotlib.org/)
 - [seaborn](https://seaborn.pydata.org/index.html)
-- [chart.js](https://www.chartjs.org/)
 - [bokeh](https://bokeh.org/)
 - [plotly](https://plotly.com/python/)
 
@@ -219,7 +218,7 @@ There is a lot of information on the internet about the Python + visualization l
 There is a lot of information on the internet about the node.js + __real time__ visualization library.   
 - [epoch](https://epochjs.github.io/epoch/real-time/)
 - [plotly](https://plotly.com/javascript/streaming/)
-- [pusher](https://pusher.com/tutorials/graph-javascript/)
+- [chartjs-plugin-streaming](https://nagix.github.io/chartjs-plugin-streaming/1.9.0/)
 
 # Troubleshooting   
 There is a module of SN65HVD230 like this.   
