@@ -65,6 +65,7 @@ menu "Application Configuration"
 
 		config ENABLE_PRINT
 			bool "Output the received CAN FRAME to STDOUT"
+			default y
 			help
 				Output the received CAN FRAME to STDOUT.
 
@@ -129,7 +130,7 @@ menu "Application Configuration"
 
 		config WEB_SERVER
 			string "HTTP Server IP or mDNS"
-			default "myhttpserver"
+			default "httpserver.local"
 			help
 				The host name or IP address of the HTTP server to use.
 

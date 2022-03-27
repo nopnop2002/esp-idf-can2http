@@ -1,9 +1,9 @@
 /*
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
+	 This example code is in the Public Domain (or CC0 licensed, at your option.)
 
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
+	 Unless required by applicable law or agreed to in writing, this
+	 software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+	 CONDITIONS OF ANY KIND, either express or implied.
 */
 
 #include <stdio.h>
@@ -65,7 +65,7 @@ static EventGroupHandle_t s_wifi_event_group;
  * - we are connected to the AP with an IP
  * - we failed to connect after the maximum amount of retries */
 #define WIFI_CONNECTED_BIT BIT0
-#define WIFI_FAIL_BIT	   BIT1
+#define WIFI_FAIL_BIT		 BIT1
 
 static int s_retry_num = 0;
 
@@ -102,17 +102,21 @@ void wifi_init_sta()
 	s_wifi_event_group = xEventGroupCreate();
 
 	ESP_LOGI(TAG,"ESP-IDF Ver%d.%d", ESP_IDF_VERSION_MAJOR, ESP_IDF_VERSION_MINOR);
+	ESP_LOGI(TAG,"ESP_IDF_VERSION %d", ESP_IDF_VERSION);
 
-#if ESP_IDF_VERSION_MAJOR >= 4 && ESP_IDF_VERSION_MINOR >= 1
+//#if ESP_IDF_VERSION_MAJOR >= 4 && ESP_IDF_VERSION_MINOR >= 1
+#if ESP_IDF_VERSION > ESP_IDF_VERSION_VAL(4, 1, 0)
 	ESP_LOGI(TAG,"ESP-IDF esp_netif");
 	ESP_ERROR_CHECK(esp_netif_init());
 	ESP_ERROR_CHECK(esp_event_loop_create_default());
 	esp_netif_t *netif = esp_netif_create_default_wifi_sta();
+	assert(netif);
 #else
-	ESP_LOGI(TAG,"ESP-IDF tcpip_adapter");
-	tcpip_adapter_init();
-	ESP_ERROR_CHECK(esp_event_loop_create_default());
-#endif
+	ESP_LOGE(TAG,"esp-idf version 4.1 or higher required");
+	while(1) {
+		vTaskDelay(1);
+	}
+#endif // ESP_IDF_VERSION
 
 #if CONFIG_STATIC_IP
 
@@ -120,7 +124,6 @@ void wifi_init_sta()
 	ESP_LOGI(TAG, "CONFIG_STATIC_GW_ADDRESS=[%s]",CONFIG_STATIC_GW_ADDRESS);
 	ESP_LOGI(TAG, "CONFIG_STATIC_NM_ADDRESS=[%s]",CONFIG_STATIC_NM_ADDRESS);
 
-#if ESP_IDF_VERSION_MAJOR >= 4 && ESP_IDF_VERSION_MINOR >= 1
 	/* Stop DHCP client */
 	ESP_ERROR_CHECK(esp_netif_dhcpc_stop(netif));
 	ESP_LOGI(TAG, "Stop DHCP Services");
@@ -132,20 +135,6 @@ void wifi_init_sta()
 	ip_info.netmask.addr = ipaddr_addr(CONFIG_STATIC_NM_ADDRESS);
 	ip_info.gw.addr = ipaddr_addr(CONFIG_STATIC_GW_ADDRESS);;
 	esp_netif_set_ip_info(netif, &ip_info);
-
-#else
-	/* Stop DHCP client */
-	tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_STA);
-	ESP_LOGI(TAG, "Stop DHCP Services");
-
-	/* Set STATIC IP Address */
-	tcpip_adapter_ip_info_t ip_info;
-	memset(&ip_info, 0 , sizeof(tcpip_adapter_ip_info_t));
-	ip_info.ip.addr = ipaddr_addr(CONFIG_STATIC_IP_ADDRESS);
-	ip_info.netmask.addr = ipaddr_addr(CONFIG_STATIC_NM_ADDRESS);
-	ip_info.gw.addr = ipaddr_addr(CONFIG_STATIC_GW_ADDRESS);;
-	tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_STA, &ip_info);
-#endif
 
 	/*
 	I referred from here.
@@ -162,7 +151,7 @@ void wifi_init_sta()
 	d.u_addr.ip4.addr = 0x08080404; //8.8.4.4 dns
 	dns_setserver(1, &d);
 
-#endif
+#endif // CONFIG_STATIC_IP
 
 	wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
 	ESP_ERROR_CHECK(esp_wifi_init(&cfg));
@@ -383,8 +372,8 @@ void app_main()
 	// Initialize NVS
 	esp_err_t ret = nvs_flash_init();
 	if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-	  ESP_ERROR_CHECK(nvs_flash_erase());
-	  ret = nvs_flash_init();
+		ESP_ERROR_CHECK(nvs_flash_erase());
+		ret = nvs_flash_init();
 	}
 	ESP_ERROR_CHECK(ret);
 

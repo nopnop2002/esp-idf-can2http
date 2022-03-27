@@ -73,29 +73,11 @@ __NOTE__
 Check [here](http://www.ti.com/lit/an/slla337/slla337.pdf).
 
 
-# Installation for ESP32
+# Installation
 ```
 git clone https://github.com/nopnop2002/esp-idf-can2http
 cd esp-idf-can2http
-idf.py set-target esp32
-idf.py menuconfig
-idf.py flash
-```
-
-# Installation for ESP32-S2
-```
-git clone https://github.com/nopnop2002/esp-idf-can2http
-cd esp-idf-can2http
-idf.py set-target esp32s2
-idf.py menuconfig
-idf.py flash
-```
-
-# Installation for ESP32-C3
-```
-git clone https://github.com/nopnop2002/esp-idf-can2http
-cd esp-idf-can2http
-idf.py set-target esp32c3
+idf.py set-target {esp32/esp32s2/esp32c3}
 idf.py menuconfig
 idf.py flash
 ```
@@ -105,7 +87,7 @@ idf.py flash
 ![config-app](https://user-images.githubusercontent.com/6020549/123870638-94709180-d96d-11eb-94da-b4860148be6a.jpg)
 
 ## CAN Setting
-![config-can](https://user-images.githubusercontent.com/6020549/123870665-a05c5380-d96d-11eb-89b1-78a274bfd957.jpg)
+![config-can](https://user-images.githubusercontent.com/6020549/160263252-f2a10f2b-a970-44bf-ab9c-22ae7baa4ab5.jpg)
 
 ## WiFi Setting
 ![config-wifi-1](https://user-images.githubusercontent.com/6020549/125028704-73254900-e0c3-11eb-9a44-25482d7a08be.jpg)
@@ -118,7 +100,7 @@ You can connect using mDNS.
 
 ## External HTTP Server Setting   
 The External HTTP Server receives CAN Bus received data.   
-![config-http](https://user-images.githubusercontent.com/6020549/123873614-b5d37c80-d971-11eb-8ead-827f52aed982.jpg)
+![config-http](https://user-images.githubusercontent.com/6020549/160263251-1b1a4771-a5f0-43f2-b75e-572fa6904ac9.jpg)
 
 __Note__   
 The Built-in HTTP Server receives CAN Bus transmittion data.   
@@ -178,10 +160,12 @@ CANBus reception using UNO.
 
 # HTTP Server Using Tornado
 ```
+cd $HOME
 sudo apt install python3-pip python3-setuptools
 python -m pip install -U pip
 python -m pip install -U wheel
 python -m pip install tornado
+cd esp-idf-can2http
 cd tornado
 python can.py
 ```
@@ -190,11 +174,13 @@ python can.py
 
 # HTTP Server Using Flask
 ```
+cd $HOME
 sudo apt install python3-pip python3-setuptools
 python -m pip install -U pip
 python -m pip install -U wheel
 python -m pip install -U Werkzeug
 python -m pip install flask
+cd esp-idf-can2http
 cd flask
 python can.py
 ```
