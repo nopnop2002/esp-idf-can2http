@@ -1,10 +1,10 @@
 /* ESP HTTP Client Example
 
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
+	 This example code is in the Public Domain (or CC0 licensed, at your option.)
 
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
+	 Unless required by applicable law or agreed to in writing, this
+	 software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+	 CONDITIONS OF ANY KIND, either express or implied.
 */
 
 #include <string.h>
@@ -90,6 +90,11 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt)
 				ESP_LOGI(TAG, "Last mbedtls failure: 0x%x", mbedtls_err);
 			}
 			break;
+		case HTTP_EVENT_REDIRECT:
+			ESP_LOGD(TAG, "HTTP_EVENT_REDIRECT");
+			esp_http_client_set_header(evt->client, "From", "user@example.com");
+			esp_http_client_set_header(evt->client, "Accept", "text/html");
+			break;
 	}
 	return ESP_OK;
 }
@@ -111,7 +116,7 @@ static void http_rest_with_url(char * path, char * post_data)
 		.port = CONFIG_WEB_PORT,
 		.path = path,
 		.event_handler = _http_event_handler,
-		.user_data = local_response_buffer,		   // Pass address of local buffer to get response
+		.user_data = local_response_buffer, // Pass address of local buffer to get response
 		.disable_auto_redirect = true,
 	};
 
@@ -120,7 +125,7 @@ static void http_rest_with_url(char * path, char * post_data)
 	esp_http_client_config_t config = {
 		.url = "http://192.168.10.43:8000/post",
 		.event_handler = _http_event_handler,
-		.user_data = local_response_buffer,		   // Pass address of local buffer to get response
+		.user_data = local_response_buffer, // Pass address of local buffer to get response
 		.disable_auto_redirect = true,
 	};
 #endif
@@ -148,7 +153,7 @@ static void http_rest_with_url(char * path, char * post_data)
 
 void http_client_task(void *pvParameters)
 {
-	ESP_LOGI(TAG, "Start HTTP Client: http://%s:%d", CONFIG_WEB_SERVER, CONFIG_WEB_PORT);
+	ESP_LOGI(TAG, "Start HTTP Client: connect to http://%s:%d", CONFIG_WEB_SERVER, CONFIG_WEB_PORT);
 	FRAME_t frameBuf;
 	while (1) {
 		xQueueReceive(xQueue_http_client, &frameBuf, portMAX_DELAY);

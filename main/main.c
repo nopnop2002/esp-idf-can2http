@@ -104,19 +104,10 @@ void wifi_init_sta()
 	ESP_LOGI(TAG,"ESP-IDF Ver%d.%d", ESP_IDF_VERSION_MAJOR, ESP_IDF_VERSION_MINOR);
 	ESP_LOGI(TAG,"ESP_IDF_VERSION %d", ESP_IDF_VERSION);
 
-//#if ESP_IDF_VERSION_MAJOR >= 4 && ESP_IDF_VERSION_MINOR >= 1
-#if ESP_IDF_VERSION > ESP_IDF_VERSION_VAL(4, 1, 0)
-	ESP_LOGI(TAG,"ESP-IDF esp_netif");
 	ESP_ERROR_CHECK(esp_netif_init());
 	ESP_ERROR_CHECK(esp_event_loop_create_default());
 	esp_netif_t *netif = esp_netif_create_default_wifi_sta();
 	assert(netif);
-#else
-	ESP_LOGE(TAG,"esp-idf version 4.1 or higher required");
-	while(1) {
-		vTaskDelay(1);
-	}
-#endif // ESP_IDF_VERSION
 
 #if CONFIG_STATIC_IP
 
@@ -357,7 +348,7 @@ esp_err_t build_table(TOPIC_t **topics, char *file, int16_t *ntopic)
 void dump_table(TOPIC_t *topics, int16_t ntopic)
 {
 	for(int i=0;i<ntopic;i++) {
-		ESP_LOGI(pcTaskGetTaskName(0), "topics[%d] frame=%d canid=0x%x topic=[%s] topic_len=%d",
+		ESP_LOGI(pcTaskGetName(0), "topics[%d] frame=%d canid=0x%x topic=[%s] topic_len=%d",
 		i, (topics+i)->frame, (topics+i)->canid, (topics+i)->topic, (topics+i)->topic_len);
 	}
 
@@ -416,11 +407,14 @@ void app_main()
 	dump_table(publish, npublish);
 
 	/* Get the local IP address */
-	tcpip_adapter_ip_info_t ip_info;
-	ESP_ERROR_CHECK(tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip_info));
+	//tcpip_adapter_ip_info_t ip_info;
+	//ESP_ERROR_CHECK(tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip_info));
+	esp_netif_ip_info_t ip_info;
+	ESP_ERROR_CHECK(esp_netif_get_ip_info(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"), &ip_info));
 
 	char cparam0[64];
-	sprintf(cparam0, "%s", ip4addr_ntoa(&ip_info.ip));
+	//sprintf(cparam0, "%s", ip4addr_ntoa(&ip_info.ip));
+	sprintf(cparam0, IPSTR, IP2STR(&ip_info.ip));
 	xTaskCreate(http_server_task, "server", 1024*6, (void *)cparam0, 2, NULL);
 
 	xTaskCreate(http_client_task, "client", 1024*6, NULL, 2, NULL);

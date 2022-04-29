@@ -50,7 +50,7 @@ void twai_task(void *pvParameters)
 
 #if CONFIG_ENABLE_PRINT
 			if (ext == STANDARD_FRAME) {
-				printf("Standard ID: 0x%03x		", rx_msg.identifier);
+				printf("Standard ID: 0x%03x     ", rx_msg.identifier);
 			} else {
 				printf("Extended ID: 0x%08x", rx_msg.identifier);
 			}
