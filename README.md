@@ -8,8 +8,8 @@ It's purpose is to be a bridge between a CAN-Bus and a HTTP-Server.
 
 
 # Software requirement
-esp-idf v4.2-dev-2243 or later.   
-Use twai(Two-Wire Automotive Interface) driver instead of can driver.   
+esp-idf v4.4 or later.   
+This is because this version supports ESP32-C3.   
 
 # Hardware requirements
 - SN65HVD23x CAN-BUS Transceiver   
@@ -162,9 +162,9 @@ CANBus reception using UNO.
 ```
 cd $HOME
 sudo apt install python3-pip python3-setuptools
-python -m pip install -U pip
-python -m pip install -U wheel
-python -m pip install tornado
+python3 -m pip install -U pip
+python3 -m pip install -U wheel
+python3 -m pip install tornado
 cd esp-idf-can2http
 cd tornado
 python can.py
@@ -176,10 +176,10 @@ python can.py
 ```
 cd $HOME
 sudo apt install python3-pip python3-setuptools
-python -m pip install -U pip
-python -m pip install -U wheel
-python -m pip install -U Werkzeug
-python -m pip install flask
+python3 -m pip install -U pip
+python3 -m pip install -U wheel
+python3 -m pip install -U Werkzeug
+python3 -m pip install flask
 cd esp-idf-can2http
 cd flask
 python can.py
