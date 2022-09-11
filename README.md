@@ -167,7 +167,7 @@ python3 -m pip install -U wheel
 python3 -m pip install tornado
 cd esp-idf-can2http
 cd tornado
-python can.py
+python3 can.py
 ```
 ![can2http-tornado](https://user-images.githubusercontent.com/6020549/123871778-18774900-d96f-11eb-95b6-df9713047c30.jpg)
 
@@ -182,7 +182,7 @@ python3 -m pip install -U Werkzeug
 python3 -m pip install flask
 cd esp-idf-can2http
 cd flask
-python can.py
+python3 can.py
 ```
 
 ![can2http-flask](https://user-images.githubusercontent.com/6020549/123871850-35ac1780-d96f-11eb-9d03-c1a0b547e9c8.jpg)
