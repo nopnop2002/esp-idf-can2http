@@ -164,8 +164,8 @@ static esp_err_t twai_send_handler(httpd_req_t *req)
 	}
 
 	// Search data item
-    int16_t data_len;
-    char data_value[8];
+	int16_t data_len;
+	char data_value[8];
 	state = cJSON_GetObjectItem(root, "data");
 	if (state) {
 		cJSON *data_array = cJSON_GetObjectItem(root,"data");
@@ -267,19 +267,19 @@ esp_err_t start_server(const char *base_path, int port)
 
 	/* URI handler for getting system info */
 	httpd_uri_t system_info_get_uri = {
-		.uri	   = "/api/system/info",
+		.uri       = "/api/system/info",
 		.method    = HTTP_GET,
 		.handler   = system_info_get_handler,
-		.user_ctx = rest_context
+		.user_ctx  = rest_context
 	};
 	httpd_register_uri_handler(server, &system_info_get_uri);
 
 	/* URI handler for send twai */
 	httpd_uri_t twai_send_post_uri = {
-		.uri	   = "/api/twai/send",
+		.uri       = "/api/twai/send",
 		.method    = HTTP_POST,
 		.handler   = twai_send_handler,
-		.user_ctx = rest_context
+		.user_ctx  = rest_context
 	};
 	httpd_register_uri_handler(server, &twai_send_post_uri);
 

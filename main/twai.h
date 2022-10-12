@@ -4,7 +4,7 @@
 #define DATA_FRAME     0
 #define REMOTE_FRAME   1
 
-#define	CMD_RECEIVE	100
+#define	CMD_RECEIVE 100
 #define	CMD_SEND    200
 
 typedef struct {
