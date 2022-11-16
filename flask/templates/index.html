@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta http-equiv="refresh" content="5;url="/">
+	<title>CAN DATA</title>
+</head>
+
+<body>
+	Display the latest {{ lines }} records.<br>
+	If you want to see more, specify the number of lines at startup.<br>
+
+	<table border="1" cellpadding="2" cellspacing="2">
+	<tbody>
+		<tr style="color:#ffffff;" bgcolor="#800000">
+			<th valign="top">Date</th>
+			<th valign="top">Time</th>
+			<th valign="top">ID</th>
+			<th valign="top">Frame</th>
+			<th valign="top">Value</th>
+		</tr>
+
+		{% for i in items %}
+		<tr>
+			<td>{{ i.date }}</td>
+			<td>{{ i.time }}</td>
+			<td>{{ i.id }}</td>
+			<td>{{ i.frame }}</td>
+			<td>{{ i.value }}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+</body>
+</html>

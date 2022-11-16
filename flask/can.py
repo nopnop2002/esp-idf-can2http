@@ -2,10 +2,12 @@
 # -*- coding: utf-8 -*-
 # Simple REST Server
 
+import os
 import sys
 import json
 import datetime
-from flask import Flask, request
+import argparse
+from flask import Flask, request, render_template
 app = Flask(__name__)
 
 database = []
@@ -13,13 +15,21 @@ database = []
 @app.route("/")
 def root():
 	global database
-	res = ""
+	items = []
 	for data in database:
-		print("{}".format(data))
-		#print("{}".format(len(data[2])))
-		res = res + "{} {:x} {} {}".format(data[0],data[1],data[2],data[3]) + "<br>"
-	#return "Hello World!"
-	return res
+		#print("{}".format(data))
+		datetime = data[0].split()
+		#print("data={} datetime={}".format(data[0], datetime))
+
+		items.append({
+			"date": datetime[0],
+			"time": datetime[1],
+			"id": data[1],
+			"frame": data[2],
+			"value": data[3]
+		})
+	#print("items={}".format(items))
+	return render_template("index.html", lines=app.config['lines'], items=items)
 
 #curl -X POST -H "Content-Type: application/json" -d '{"canid":101, "frame":"standard" , "data": [1,2,3,4,5,6,7,8]}' http://192.168.10.43:8000/post
 @app.route("/post", methods=["POST"])
@@ -48,7 +58,9 @@ def post():
 
 	global database
 	#print("{} {} {}".format(type(database), len(database), database))
-	if(len(database) >= 20):
+	print("lines={}".format(app.config['lines']))
+	#if(len(database) >= 20):
+	if(len(database) >= app.config['lines']):
 		database.pop(0)
 	database.append(items)
 
@@ -56,6 +68,13 @@ def post():
 	return data
 
 if __name__ == "__main__":
+	parser = argparse.ArgumentParser()
+	parser.add_argument('-port', type=int, default=8000)
+	parser.add_argument('-lines', type=int, default=20)
+	args = parser.parse_args()
+	print("port={}".format(args.port))
+	print("lines={}".format(args.lines))
+	app.config['lines'] = args.lines
 	#app.run()
-	app.run(host='0.0.0.0', port=8000, debug=True)
+	app.run(host='0.0.0.0', port=args.port, debug=True)
 
