@@ -8,6 +8,7 @@
 */
 
 #include <stdio.h>
+#include <inttypes.h>
 #include <string.h>
 
 #include "freertos/FreeRTOS.h"
@@ -138,7 +139,7 @@ static esp_err_t twai_send_handler(httpd_req_t *req)
 	cJSON* state = cJSON_GetObjectItem(root, "canid");
 	if (state) {
 		canid = cJSON_GetObjectItem(root, "canid")->valueint;
-		ESP_LOGI(TAG, "canid=%x", canid);
+		ESP_LOGI(TAG, "canid=%"PRIx32, canid);
 	} else {
 		ESP_LOGE(TAG, "canid item not found");
 		parse = false;
@@ -209,7 +210,7 @@ static esp_err_t twai_send_handler(httpd_req_t *req)
 
 	// JSON parse success. Send twai data.
 	if (parse) {
-		ESP_LOGI(TAG, "twai_send_handler frame=%d canid=%x data_len=%d", frame, canid, data_len);
+		ESP_LOGI(TAG, "twai_send_handler frame=%d canid=%"PRIx32" data_len=%d", frame, canid, data_len);
 		ESP_LOG_BUFFER_HEX(TAG, data_value, data_len);
 		twai_message_t tx_msg;
 		tx_msg.extd = frame;

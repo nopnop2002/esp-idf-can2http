@@ -7,6 +7,8 @@
 	 CONDITIONS OF ANY KIND, either express or implied.
 */
 
+#include <stdio.h>
+#include <inttypes.h>
 #include <string.h>
 #include <stdlib.h>
 #include "freertos/FreeRTOS.h"
@@ -139,7 +141,7 @@ static void http_rest_with_url(char * path, char * post_data)
 	esp_http_client_set_post_field(client, post_data, strlen(post_data));
 	esp_err_t err = esp_http_client_perform(client);
 	if (err == ESP_OK) {
-		ESP_LOGI(TAG, "HTTP POST Status = %d, content_length = %d",
+		ESP_LOGI(TAG, "HTTP POST Status = %d, content_length = %lld",
 				esp_http_client_get_status_code(client),
 				esp_http_client_get_content_length(client));
 		ESP_LOGI(TAG, "local_response_buffer=[%s]", local_response_buffer);
@@ -157,7 +159,7 @@ void http_client_task(void *pvParameters)
 	FRAME_t frameBuf;
 	while (1) {
 		xQueueReceive(xQueue_http_client, &frameBuf, portMAX_DELAY);
-		ESP_LOGI(TAG, "canid=%x ext=%d topic=[%s]", frameBuf.canid, frameBuf.ext, frameBuf.topic);
+		ESP_LOGI(TAG, "canid=%"PRIx32" ext=%d topic=[%s]", frameBuf.canid, frameBuf.ext, frameBuf.topic);
 		for(int i=0;i<frameBuf.data_len;i++) {
 			ESP_LOGI(TAG, "DATA=%x", frameBuf.data[i]);
 		}

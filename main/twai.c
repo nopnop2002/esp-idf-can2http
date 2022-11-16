@@ -8,6 +8,7 @@
 */
 
 #include <stdio.h>
+#include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
 #include "freertos/FreeRTOS.h"
@@ -41,7 +42,7 @@ void twai_task(void *pvParameters)
 	while (1) {
 		esp_err_t ret = twai_receive(&rx_msg, pdMS_TO_TICKS(10));
 		if (ret == ESP_OK) {
-			ESP_LOGD(TAG,"twai_receive identifier=0x%x flags=0x%x data_length_code=%d",
+			ESP_LOGD(TAG,"twai_receive identifier=0x%"PRIx32" flags=0x%"PRIx32" data_length_code=%d",
 				rx_msg.identifier, rx_msg.flags, rx_msg.data_length_code);
 
 			int ext = rx_msg.flags & 0x01;
@@ -50,9 +51,9 @@ void twai_task(void *pvParameters)
 
 #if CONFIG_ENABLE_PRINT
 			if (ext == STANDARD_FRAME) {
-				printf("Standard ID: 0x%03x     ", rx_msg.identifier);
+				printf("Standard ID: 0x%03"PRIx32"     ", rx_msg.identifier);
 			} else {
-				printf("Extended ID: 0x%08x", rx_msg.identifier);
+				printf("Extended ID: 0x%08"PRIx32, rx_msg.identifier);
 			}
 			printf(" DLC: %d  Data: ", rx_msg.data_length_code);
 
@@ -70,7 +71,7 @@ void twai_task(void *pvParameters)
 			for(int index=0;index<npublish;index++) {
 				if (publish[index].frame != ext) continue;
 				if (publish[index].canid == rx_msg.identifier) {
-					ESP_LOGI(TAG, "publish[%d] frame=%d canid=0x%x topic=[%s] topic_len=%d",
+					ESP_LOGI(TAG, "publish[%d] frame=%d canid=0x%"PRIx32" topic=[%s] topic_len=%d",
 					index, publish[index].frame, publish[index].canid, publish[index].topic, publish[index].topic_len);
 					strcpy(frameBuf.topic, publish[index].topic);
 					frameBuf.command = CMD_RECEIVE;
@@ -94,7 +95,7 @@ void twai_task(void *pvParameters)
 
 		} else if (ret == ESP_ERR_TIMEOUT) {
 			if (xQueueReceive(xQueue_twai_tx, &tx_msg, 0) == pdTRUE) {
-				ESP_LOGI(TAG, "tx_msg.identifier=[0x%x] tx_msg.extd=%d", tx_msg.identifier, tx_msg.extd);
+				ESP_LOGI(TAG, "tx_msg.identifier=[0x%"PRIx32"] tx_msg.extd=%d", tx_msg.identifier, tx_msg.extd);
 				twai_status_info_t status_info;
 				twai_get_status_info(&status_info);
 				ESP_LOGD(TAG, "status_info.state=%d",status_info.state);
@@ -102,8 +103,8 @@ void twai_task(void *pvParameters)
 					ESP_LOGE(TAG, "TWAI driver not running %d", status_info.state);
 					continue;
 				}
-				ESP_LOGD(TAG, "status_info.msgs_to_tx=%d",status_info.msgs_to_tx);
-				ESP_LOGD(TAG, "status_info.msgs_to_rx=%d",status_info.msgs_to_rx);
+				ESP_LOGD(TAG, "status_info.msgs_to_tx=%"PRIu32,status_info.msgs_to_tx);
+				ESP_LOGD(TAG, "status_info.msgs_to_rx=%"PRIu32,status_info.msgs_to_rx);
 				//esp_err_t ret = twai_transmit(&tx_msg, pdMS_TO_TICKS(10));
 				esp_err_t ret = twai_transmit(&tx_msg, 0);
 				if (ret == ESP_OK) {
