@@ -172,6 +172,8 @@ python3 can.py
 ```
 
 You can specify the number of lines to display and the port number.   
+The default port number is 8000 and the default number of display lines is 20.   
+Redisplay every 5 seconds.   
 ![can2http-tornado](https://user-images.githubusercontent.com/6020549/202159913-74fab7ef-d95c-4774-8432-ceceac24af4e.jpg)
 
 
@@ -190,6 +192,7 @@ python3 can.py
 ```
 
 You can specify the number of lines to display and the port number.   
+The default port number is 8000 and the default number of display lines is 20.   
 Redisplay every 5 seconds.   
 ![can2http-flask](https://user-images.githubusercontent.com/6020549/202159650-65d30531-060e-4276-ac7f-529b33052b04.jpg)
 
