@@ -8,7 +8,7 @@ It's purpose is to be a bridge between a CAN-Bus and a HTTP-Server.
 
 
 # Software requirement
-esp-idf v4.4 or later.   
+esp-idf v4.4/v5.0.   
 This is because this version supports ESP32-C3.   
 
 # Hardware requirements
