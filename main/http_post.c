@@ -92,11 +92,13 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt)
 				ESP_LOGI(TAG, "Last mbedtls failure: 0x%x", mbedtls_err);
 			}
 			break;
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
 		case HTTP_EVENT_REDIRECT:
 			ESP_LOGD(TAG, "HTTP_EVENT_REDIRECT");
 			esp_http_client_set_header(evt->client, "From", "user@example.com");
 			esp_http_client_set_header(evt->client, "Accept", "text/html");
 			break;
+#endif
 	}
 	return ESP_OK;
 }
