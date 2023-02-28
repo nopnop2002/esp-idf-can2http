@@ -134,6 +134,8 @@ CAN-ID is a decimal number, not a hexadecimal number.
 {"canid":259, "frame": "extended", "data": [16, 17, 18]}
 ```
 
+__CAN messages not registered in csv/can2http.csv are discarded and not POSTed to HTTP.__
+
 # Definition from HTTP to CANbus
 Not exist.   
 You can send any CAN-ID.   
