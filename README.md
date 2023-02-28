@@ -240,7 +240,13 @@ If the transmission fails, these are the possible causes.
 - Stub length in CAN bus is too long. See [here](https://e2e.ti.com/support/interface-group/interface/f/interface-forum/378932/iso1050-can-bus-stub-length).
 
 # Reference
+https://github.com/nopnop2002/esp-idf-candump
 
 https://github.com/nopnop2002/esp-idf-can2mqtt
 
+https://github.com/nopnop2002/esp-idf-can2usb
+
+https://github.com/nopnop2002/esp-idf-can-browser
+
 https://github.com/nopnop2002/esp-idf-CANBus-Monitor
+
