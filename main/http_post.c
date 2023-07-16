@@ -1,10 +1,10 @@
-/* ESP HTTP Client Example
+/*	ESP HTTP Client Example
 
-	 This example code is in the Public Domain (or CC0 licensed, at your option.)
+	This example code is in the Public Domain (or CC0 licensed, at your option.)
 
-	 Unless required by applicable law or agreed to in writing, this
-	 software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-	 CONDITIONS OF ANY KIND, either express or implied.
+	Unless required by applicable law or agreed to in writing, this
+	software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+	CONDITIONS OF ANY KIND, either express or implied.
 */
 
 #include <stdio.h>
@@ -107,6 +107,7 @@ esp_err_t _http_event_handler(esp_http_client_event_t *evt)
 
 static void http_rest_with_url(char * path, char * post_data)
 {
+	ESP_LOGI(TAG, "path=[%s]", path);
 	char local_response_buffer[MAX_HTTP_OUTPUT_BUFFER] = {0};
 	/**
 	 * NOTE: All the configuration parameters for http_client must be spefied either in URL or as host and path parameters.
@@ -115,6 +116,7 @@ static void http_rest_with_url(char * path, char * post_data)
 	 *
 	 * If URL as well as host and path parameters are specified, values of host and path will be considered.
 	 */
+#if 1
 	esp_http_client_config_t config = {
 		.host = CONFIG_WEB_SERVER,
 		.port = CONFIG_WEB_PORT,
@@ -123,11 +125,10 @@ static void http_rest_with_url(char * path, char * post_data)
 		.user_data = local_response_buffer, // Pass address of local buffer to get response
 		.disable_auto_redirect = true,
 	};
-
-#if 0
+#else
 	// Same as above
 	esp_http_client_config_t config = {
-		.url = "http://192.168.10.43:8000/post",
+		.url = "http://http-server.local:8000/post",
 		.event_handler = _http_event_handler,
 		.user_data = local_response_buffer, // Pass address of local buffer to get response
 		.disable_auto_redirect = true,
@@ -142,8 +143,6 @@ static void http_rest_with_url(char * path, char * post_data)
 	esp_http_client_set_header(client, "Content-Type", "application/json");
 	esp_http_client_set_post_field(client, post_data, strlen(post_data));
 	esp_err_t err = esp_http_client_perform(client);
-	// ESP-IDF V4.4 int esp_http_client_get_content_length
-	// ESP-IDF V5.0 int64_t esp_http_client_get_content_length
 	if (err == ESP_OK) {
 		ESP_LOGI(TAG, "HTTP POST Status = %d, content_length = %lld",
 				esp_http_client_get_status_code(client),
