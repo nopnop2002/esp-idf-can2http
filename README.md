@@ -8,8 +8,9 @@ It's purpose is to be a bridge between a CAN-Bus and a HTTP-Server.
 
 
 # Software requirement
-ESP-IDF V4.4/V5.x.   
-ESP-IDF V5.1 is required when using ESP32C6.   
+ESP-IDF V5.0 or later.   
+ESP-IDF V4.4 release branch reached EOL in July 2024.   
+ESP-IDF V5.1 is required when using ESP32-C6.   
 
 # Hardware requirements
 - SN65HVD23x CAN-BUS Transceiver   
