@@ -172,6 +172,7 @@ cd $HOME
 sudo apt install python3-pip python3-setuptools
 python3 -m pip install -U pip
 python3 -m pip install -U wheel
+python3 -m pip install werkzeug
 python3 -m pip install tornado
 git clone https://github.com/nopnop2002/esp-idf-can2http
 cd esp-idf-can2http
