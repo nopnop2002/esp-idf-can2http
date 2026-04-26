@@ -10,7 +10,15 @@ It's purpose is to be a bridge between a CAN-Bus and a HTTP-Server.
 # Software requirement
 ESP-IDF V5.0 or later.   
 ESP-IDF V4.4 release branch reached EOL in July 2024.   
-ESP-IDF V5.1 is required when using ESP32-C6.   
+
+__Note for ESP-IDF V6__   
+This option is required for ESP-IDF V6 because this project uses legacy drivers.   
+<img width="659" height="486" alt="Image" src="https://github.com/user-attachments/assets/fd46966b-6a9f-4034-a9e3-b13a75c02bc8" />
+
+ESP-IDF V6 gives this warning, but it still works.   
+```
+#warning "The legacy TWAI driver is deprecated, please use esp_twai.h"
+```
 
 # Hardware requirements
 - SN65HVD23x CAN-BUS Transceiver   
