@@ -94,7 +94,7 @@ void twai_task(void *pvParameters)
 			}
 
 		} else if (ret == ESP_ERR_TIMEOUT) {
-			if (xQueueReceive(xQueue_twai_tx, &tx_msg, 0) == pdTRUE) {
+			if (xQueueReceive(xQueue_twai_tx, &tx_msg, 0) == pdPASS) {
 				ESP_LOGI(TAG, "tx_msg.identifier=[0x%"PRIx32"] tx_msg.extd=%d", tx_msg.identifier, tx_msg.extd);
 				twai_status_info_t status_info;
 				twai_get_status_info(&status_info);
