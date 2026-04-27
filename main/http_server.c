@@ -14,20 +14,16 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
-#include "freertos/semphr.h"
 #include "esp_log.h"
 #include "esp_err.h"
 #include "esp_vfs.h"
-#include "esp_spiffs.h"
 #include "esp_http_server.h"
 #include "esp_chip_info.h"
 #include "cJSON.h"
-#include "driver/twai.h"
 
-#include "twai.h"
+#include "frame.h"
 
 static const char *TAG = "SERVER";
-//static SemaphoreHandle_t ctrl_task_sem;
 
 extern QueueHandle_t xQueue_twai_tx;
 
@@ -139,7 +135,7 @@ static esp_err_t twai_send_handler(httpd_req_t *req)
 	cJSON* state = cJSON_GetObjectItem(root, "canid");
 	if (state) {
 		canid = cJSON_GetObjectItem(root, "canid")->valueint;
-		ESP_LOGI(TAG, "canid=%"PRIx32, canid);
+		ESP_LOGI(TAG, "canid=0x%"PRIx32, canid);
 	} else {
 		ESP_LOGE(TAG, "canid item not found");
 		parse = false;
@@ -170,7 +166,7 @@ static esp_err_t twai_send_handler(httpd_req_t *req)
 	state = cJSON_GetObjectItem(root, "data");
 	if (state) {
 		cJSON *data_array = cJSON_GetObjectItem(root,"data");
-		ESP_LOGI(TAG, "data_array->type=%s", JSON_Types(data_array->type));
+		ESP_LOGD(TAG, "data_array->type=%s", JSON_Types(data_array->type));
 		if (data_array->type == cJSON_Array) {
 			int data_array_size = cJSON_GetArraySize(data_array);
 			ESP_LOGI(TAG, "data_array_size=%d", data_array_size);
@@ -212,18 +208,15 @@ static esp_err_t twai_send_handler(httpd_req_t *req)
 	if (parse) {
 		ESP_LOGI(TAG, "twai_send_handler frame=%d canid=%"PRIx32" data_len=%d", frame, canid, data_len);
 		ESP_LOG_BUFFER_HEX(TAG, data_value, data_len);
-		twai_message_t tx_msg;
+		FRAME_t tx_msg;
+		tx_msg.canid = canid;
 		tx_msg.extd = frame;
-		tx_msg.ss = 1;
-		tx_msg.self = 0;
-		tx_msg.dlc_non_comp = 0;
-		tx_msg.identifier = canid;
-		tx_msg.data_length_code = data_len;
+		tx_msg.data_len = data_len;
 		for (int i=0;i<data_len;i++) {
 			tx_msg.data[i] = data_value[i];
 		}
-		if (xQueueSend(xQueue_twai_tx, &tx_msg, portMAX_DELAY) != pdPASS) {
-			ESP_LOGE(TAG, "xQueueSend Fail");
+		if (xQueueSendFromISR(xQueue_twai_tx, &tx_msg, NULL) != pdPASS) {
+			ESP_LOGE(TAG, "xQueueSendFromISR Fail");
 		}
 		httpd_resp_sendstr(req, "twai send successfully");
 	} else {
@@ -234,7 +227,7 @@ static esp_err_t twai_send_handler(httpd_req_t *req)
 }
 
 /* Function to start the file server */
-esp_err_t start_server(const char *base_path, int port)
+esp_err_t start_server(int port)
 {
 	rest_server_context_t *rest_context = calloc(1, sizeof(rest_server_context_t));
 	if (rest_context == NULL) {
@@ -294,16 +287,7 @@ void http_server_task(void *pvParameters)
 	char url[64];
 	sprintf(url, "http://%s:%d", task_parameter, CONFIG_WEB_PORT);
 	ESP_LOGI(TAG, "Starting server on %s", url);
-
-#if 0
-	// Create Semaphore
-	// This Semaphore is used for locking
-	ctrl_task_sem = xSemaphoreCreateBinary();
-	configASSERT( ctrl_task_sem );
-	xSemaphoreGive(ctrl_task_sem);
-#endif
-
-	ESP_ERROR_CHECK(start_server("/spiffs", CONFIG_WEB_PORT));
+	ESP_ERROR_CHECK(start_server(CONFIG_WEB_PORT));
 	
 	while(1) {
 		// Nothing to do

@@ -20,7 +20,7 @@
 
 #include "cJSON.h"
 
-#include "twai.h"
+#include "frame.h"
 
 static const char *TAG = "HTTP";
 
@@ -170,7 +170,7 @@ void http_client_task(void *pvParameters)
 	FRAME_t frameBuf;
 	while (1) {
 		xQueueReceive(xQueue_http_client, &frameBuf, portMAX_DELAY);
-		ESP_LOGI(TAG, "canid=%"PRIx32" ext=%d topic=[%s]", frameBuf.canid, frameBuf.ext, frameBuf.topic);
+		ESP_LOGI(TAG, "canid=%"PRIx32" extd=%d topic=[%s]", frameBuf.canid, frameBuf.extd, frameBuf.topic);
 		for(int i=0;i<frameBuf.data_len;i++) {
 			ESP_LOGI(TAG, "DATA=%x", frameBuf.data[i]);
 		}
@@ -179,7 +179,7 @@ void http_client_task(void *pvParameters)
 		cJSON *root;
 		root = cJSON_CreateObject();
 		cJSON_AddNumberToObject(root, "canid", frameBuf.canid);
-		if (frameBuf.ext == 0) {
+		if (frameBuf.extd == 0) {
 			cJSON_AddStringToObject(root, "frame", "standard");
 		} else {
 			cJSON_AddStringToObject(root, "frame", "extended");
