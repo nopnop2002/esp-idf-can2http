@@ -181,7 +181,7 @@ You can use a server using Flask/Tornado or a simple server.
 ```
 cd $HOME
 cd esp-idf-can2http
-python3 http_server
+python3 http_server.py
 ```
 
 <img width="659" height="486" alt="Image" src="https://github.com/user-attachments/assets/f066a8f0-f69f-479d-821a-caa69445e81a" />
