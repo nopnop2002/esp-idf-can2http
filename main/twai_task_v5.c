@@ -18,7 +18,7 @@
 
 #include "frame.h"
 
-static const char *TAG = "TWAI";
+static const char *TAG = "TWAI_V5";
 
 extern QueueHandle_t xQueue_http_client;
 extern QueueHandle_t xQueue_twai_tx;
@@ -180,6 +180,7 @@ void twai_task(void *pvParameters)
 		}
 	} // end while
 
+	ESP_ERROR_CHECK(twai_stop());
+	ESP_ERROR_CHECK(twai_driver_uninstall());
 	vTaskDelete(NULL);
 }
-

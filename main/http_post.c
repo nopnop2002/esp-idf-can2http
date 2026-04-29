@@ -169,39 +169,42 @@ void http_client_task(void *pvParameters)
 	ESP_LOGI(TAG, "Start HTTP Client: connect to http://%s:%d", CONFIG_WEB_SERVER, CONFIG_WEB_PORT);
 	FRAME_t frameBuf;
 	while (1) {
-		xQueueReceive(xQueue_http_client, &frameBuf, portMAX_DELAY);
-		ESP_LOGI(TAG, "canid=%"PRIx32" extd=%d topic=[%s]", frameBuf.canid, frameBuf.extd, frameBuf.topic);
-		for(int i=0;i<frameBuf.data_len;i++) {
-			ESP_LOGI(TAG, "DATA=%x", frameBuf.data[i]);
-		}
+		if (xQueueReceive(xQueue_http_client, &frameBuf, portMAX_DELAY) == pdPASS) {
+			ESP_LOGI(TAG, "canid=%"PRIx32" extd=%d topic=[%s]", frameBuf.canid, frameBuf.extd, frameBuf.topic);
+			for(int i=0;i<frameBuf.data_len;i++) {
+				ESP_LOGI(TAG, "DATA=%x", frameBuf.data[i]);
+			}
 	
-		// build JSON string
-		cJSON *root;
-		root = cJSON_CreateObject();
-		cJSON_AddNumberToObject(root, "canid", frameBuf.canid);
-		if (frameBuf.extd == 0) {
-			cJSON_AddStringToObject(root, "frame", "standard");
-		} else {
-			cJSON_AddStringToObject(root, "frame", "extended");
-		}
-		cJSON *dataArray;
-		dataArray = cJSON_CreateArray();
-		cJSON_AddItemToObject(root, "data", dataArray);
-		for(int i=0;i<frameBuf.data_len;i++) {
-			cJSON *dataItem = NULL;
-			dataItem = cJSON_CreateNumber(frameBuf.data[i]);
-			cJSON_AddItemToArray(dataArray, dataItem);
-		}
-		char *json_string = cJSON_Print(root);
-		ESP_LOGI(TAG, "json_string\n%s",json_string);
-		cJSON_Delete(root);
+			// build JSON string
+			cJSON *root;
+			root = cJSON_CreateObject();
+			cJSON_AddNumberToObject(root, "canid", frameBuf.canid);
+			if (frameBuf.extd == 0) {
+				cJSON_AddStringToObject(root, "frame", "standard");
+			} else {
+				cJSON_AddStringToObject(root, "frame", "extended");
+			}
+			cJSON *dataArray;
+			dataArray = cJSON_CreateArray();
+			cJSON_AddItemToObject(root, "data", dataArray);
+			for(int i=0;i<frameBuf.data_len;i++) {
+				cJSON *dataItem = NULL;
+				dataItem = cJSON_CreateNumber(frameBuf.data[i]);
+				cJSON_AddItemToArray(dataArray, dataItem);
+			}
+			char *json_string = cJSON_Print(root);
+			ESP_LOGI(TAG, "json_string\n%s",json_string);
+			cJSON_Delete(root);
 
-		//char *post_data = "{\"canid\":257}";
-		//http_rest_with_url(frameBuf.topic, post_data);
-		http_rest_with_url(frameBuf.topic, json_string);
-		cJSON_free(json_string);
+			//char *post_data = "{\"canid\":257}";
+			//http_rest_with_url(frameBuf.topic, post_data);
+			http_rest_with_url(frameBuf.topic, json_string);
+			cJSON_free(json_string);
+		} else {
+			ESP_LOGE(TAG, "xQueueReceive fail");
+			break;
+		}
 	} // end while
 
-	// Never reach here
 	vTaskDelete(NULL);
 }
