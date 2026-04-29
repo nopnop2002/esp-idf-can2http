@@ -201,7 +201,7 @@ void twai_task(void *arg)
 				tx_frame.buffer_len = sendFrame.data_len;
 
 				// Timeout = 0: returns immediately if queue is full
-				ret = twai_node_transmit(node_hdl, &tx_frame, 500);
+				ret = twai_node_transmit(node_hdl, &tx_frame, 0);
 				ESP_LOGD(TAG, "twai_node_transmit ret=%d", ret);
 				if (ret != ESP_OK) {
 					ESP_LOGE(TAG, "twai_node_transmit Fail %s", esp_err_to_name(ret));
