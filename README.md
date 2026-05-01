@@ -262,6 +262,8 @@ https://github.com/nopnop2002/esp-idf-can2mqtt
 
 https://github.com/nopnop2002/esp-idf-can2usb
 
+https://github.com/nopnop2002/esp-idf-can2bt
+
 https://github.com/nopnop2002/esp-idf-can2websocket
 
 https://github.com/nopnop2002/esp-idf-can2socket
