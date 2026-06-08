@@ -24,7 +24,7 @@ Other features are the same.
 I used 150 ohms.   
 
 # Wireing   
-|SN65HVD23x||ESP32|ESP32-S2/S3|ESP32-C3/C6||
+|SN65HVD23x||ESP32|ESP32-S2/S3|ESP32-Cx||
 |:-:|:-:|:-:|:-:|:-:|:-:|
 |D(CTX)|--|GPIO21|GPIO17|GPIO0|(*1)|
 |GND|--|GND|GND|GND||
@@ -85,7 +85,6 @@ Check [here](http://www.ti.com/lit/an/slla337/slla337.pdf).
 ```
 git clone https://github.com/nopnop2002/esp-idf-can2http
 cd esp-idf-can2http
-idf.py set-target {esp32/esp32s2/esp32s3/esp32c3/esp32c6}
 idf.py menuconfig
 idf.py flash
 ```
