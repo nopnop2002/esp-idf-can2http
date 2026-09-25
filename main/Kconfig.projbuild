@@ -110,7 +110,7 @@ menu "Application Configuration"
 
 		config STATIC_IP
 			bool "Enable Static IP Address"
-			default false
+			default n
 			help
 				Enable Static IP Address.
 
